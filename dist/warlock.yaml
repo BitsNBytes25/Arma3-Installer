@@ -1,1 +1,21 @@
-- PLACEHOLDER -
+- guid: 22c349cf-7190-24c6-dbda-16d8bfb139cc
+  title: Arma 3
+  source: github
+  repo: BitsNBytes25/Arma3-Installer
+  installer: dist/installer.sh
+  author: Charlie Powell <cdp1337@bitsnbytes.dev>
+  category: Game Server
+  supports:
+    - "Debian 12, 13"
+    - "Ubuntu 24.04"
+  syntax:
+    - "--uninstall  - Perform an uninstallation"
+    - "--dir=<src> - Use a custom installation directory instead of the default (optional)"
+    - "--skip-firewall  - Do not install or configure a system firewall"
+    - "--non-interactive  - Run the installer in non-interactive mode (useful for scripted installs)"
+    - "--branch=<str> - Use a specific branch of the management script repository DEFAULT=main"
+    - "--debug  - Include to show debug output"
+  image: media/some-game-image.webp
+  icon: media/some-game-icon.webp
+  thumbnail: media/some-game-thumbnail.webp
+

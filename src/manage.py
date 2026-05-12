@@ -10,8 +10,8 @@ import os
 
 # Import the appropriate type of handler for the game installer.
 # Common options are:
-from warlock_manager.apps.base_app import BaseApp
-# from warlock_manager.apps.steam_app import SteamApp
+# from warlock_manager.apps.base_app import BaseApp
+from warlock_manager.apps.steam_app import SteamApp
 
 # Import the appropriate type of handler for the game services.
 # Common options are:
@@ -53,7 +53,7 @@ class GameMod(WarlockNexusMod):
 
 
 # For Steam games, swap 'BaseApp' with 'SteamApp'
-class GameApp(BaseApp):
+class GameApp(SteamApp):
 	"""
 	Game application manager
 	"""
@@ -61,14 +61,14 @@ class GameApp(BaseApp):
 	def __init__(self):
 		super().__init__()
 
-		self.name = 'GameName'
-		self.desc = 'Longer identifier for the game server'
+		self.name = 'Arma3'
+		self.desc = 'Arma3 Dedicated Server'
 		# For steam games, include the steam ID
-		# self.steam_id = '90'
+		self.steam_id = '233780'
 		self.service_handler = GameService
 		# Set this to the class that handles the game mod system, if applicable
 		self.mod_handler = GameMod
-		self.service_prefix = 'your-game-'
+		self.service_prefix = 'arma3-'
 
 		# Use this to mark certain features as disabled in this game manager
 		# self.disabled_features = {'api'}
@@ -96,25 +96,25 @@ class GameApp(BaseApp):
 
 		# Install the game with Steam.
 		# It's a good idea to ensure the game is installed on first run.
-		# if not self.update():
-		# 	logger.error('Failed to update Steam')
-		# 	return False
+		if not self.update():
+			logger.error('Failed to update Steam')
+			return False
 
 		# Run migrations for the application
-		# self.run_migrations()
+		self.run_migrations()
 
 		# First run is a great time to auto-create some services for this game too
-		#services = self.get_services()
-		#if len(services) == 0:
-		#	# No services detected, create one.
-		#	logger.info('No services detected, creating one...')
-		#	self.create_service('valheim-server')
-		#else:
-		# Ensure services match new format
-		#for service in services:
-		#	logger.info('Ensuring %s service file is on latest format' % service.service)
-		#	service.build_systemd_config()
-		#	service.reload()
+		services = self.get_services()
+		if len(services) == 0:
+			# No services detected, create one.
+			logger.info('No services detected, creating one...')
+			self.create_service('arma3-server')
+		else:
+			# Ensure services match new format
+			for service in services:
+				logger.info('Ensuring %s service file is on latest format' % service.service)
+				service.build_systemd_config()
+				service.reload()
 
 		return True
 
@@ -152,14 +152,16 @@ class GameService(BaseService):
 		Get the full executable for this game service
 		:return:
 		"""
-		path = os.path.join(self.get_app_directory(), 'Game-Executable.bin')
+		path = os.path.join(self.get_app_directory(), 'arma3server_x64')
+
+		service_name = self.service[self.game.service_prefix.length:]
 
 		# Add arguments for the service, if applicable
 		#args = cli_formatter(self.configs['service'], 'flag')
 		#if args:
 		#	path += ' ' + args
 
-		return path
+		return f"{path} -name={service_name} -config={service_name}.cfg"
 
 	def option_value_updated(self, option: str, previous_value, new_value) -> bool | None:
 		"""

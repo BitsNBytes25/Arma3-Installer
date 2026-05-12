@@ -8,7 +8,7 @@
 # @AUTHOR  Charlie Powell <cdp1337@bitsnbytes.dev>
 # @CATEGORY Game Server
 # @TRMM-TIMEOUT 600
-# @WARLOCK-TITLE Game Name
+# @WARLOCK-TITLE Arma 3
 # @WARLOCK-IMAGE media/some-game-image.webp
 # @WARLOCK-ICON media/some-game-icon.webp
 # @WARLOCK-THUMBNAIL media/some-game-thumbnail.webp
@@ -41,17 +41,17 @@
 ############################################
 
 # Version of this installation script, bump when you release new versions.
-INSTALLER_VERSION="v20260318"
+INSTALLER_VERSION="v20260511"
 
 # Name of the game (used to create the directory)
-GAME="GameName"
+GAME="Arma3"
 
-GAME_DESC="Game Dedicated Server"
+GAME_DESC="Arma3 Dedicated Server"
 
 # If your repo URL is github.com/username/repo, then this should be "username/repo" without the "github.com" or "https://"
-REPO="your-github/your-repo"
+REPO="BitsNBytes25/Arma3-Installer"
 
-WARLOCK_GUID="replace-with-guid-once-compiled"
+WARLOCK_GUID="22c349cf-7190-24c6-dbda-16d8bfb139cc"
 
 # Set to the username to use for this game.
 # Steam generally recommends using 'steam', but this can be whatever makes sense.
@@ -79,6 +79,7 @@ MANAGER_VERSION="2.2.12"
 # scriptlet:bz_eval_tui/prompt_yn.sh
 # scriptlet:bz_eval_tui/print_header.sh
 # scriptlet:warlock/install_warlock_manager.sh
+# scriptlet:steam/install-steamcmd.sh
 # scriptlet:bz_eval_log/log.sh
 
 print_header "$GAME_DESC *unofficial* Installer ${INSTALLER_VERSION}"
@@ -152,6 +153,8 @@ function install_application() {
 
 	# Most games install into AppFiles, so ensure it's created.
 	[ -e "$GAME_DIR/AppFiles" ] || sudo -u $GAME_USER mkdir -p "$GAME_DIR/AppFiles"
+	[ -e "$USER_HOME/.local/share/Arma 3" ] || sudo -u $GAME_USER mkdir -p "$USER_HOME/.local/share/Arma 3"
+	[ -e "$USER_HOME/.local/share/Arma 3 - Other Profiles" ] || sudo -u $GAME_USER mkdir -p "$USER_HOME/.local/share/Arma 3 - Other Profiles"
 	#[ -e "$GAME_DIR/Configs" ] || sudo -u $GAME_USER mkdir -p "$GAME_DIR/Configs"
 	#[ -e "$GAME_DIR/Packages" ] || sudo -u $GAME_USER mkdir -p "$GAME_DIR/Packages"
 
@@ -159,12 +162,12 @@ function install_application() {
 	# To download a game with steamcmd, include the following header
 	#  # scriptlet:steam/install-steamcmd.sh
 	# and use:
-	#install_steamcmd
-	## Run Steamcmd to ensure it's available; fixes the ERROR! Failed to install app '...' (Missing configuration) issue
-	#if ! sudo -u $GAME_USER /usr/games/steamcmd +login anonymous +quit; then
-	#	log_error "Steamcmd could not be ran!  Unable to install game"
-	#	exit 1
-	#fi
+	install_steamcmd
+	# Run Steamcmd to ensure it's available; fixes the ERROR! Failed to install app '...' (Missing configuration) issue
+	if ! sudo -u $GAME_USER /usr/games/steamcmd +login anonymous +quit; then
+		log_error "Steamcmd could not be ran!  Unable to install game"
+		exit 1
+	fi
 	
 	# Install the management script
 	if ! install_warlock_manager "$REPO" "$BRANCH" "$MANAGER_VERSION"; then
@@ -201,7 +204,7 @@ function upgrade_application_1_0() {
 	local SERVICE_PATH
 	local debug
 
-	LEGACY_SERVICE="some-name"
+	LEGACY_SERVICE="arma3-server"
 	SERVICE_PATH="/etc/systemd/system/${LEGACY_SERVICE}.service"
 	debug=''
 	if [ $DEBUG -eq 1 ]; then
