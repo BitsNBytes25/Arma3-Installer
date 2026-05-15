@@ -85,6 +85,12 @@ MANAGER_VERSION="main"
 
 print_header "$GAME_DESC *unofficial* Installer ${INSTALLER_VERSION}"
 
+
+echo -n "test input: "
+read TESTINPUT
+
+echo "You entered [ ${TESTINPUT} ]"
+exit 1
 ############################################
 ## Installer Actions
 ############################################
