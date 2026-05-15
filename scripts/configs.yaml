@@ -74,6 +74,12 @@ manager:
     default: public
     help: "The Steam branch to install the server from (e.g., stable, experimental)."
     group: Settings
+  - name: Steam Username
+    section: Steam
+    key: steam_username
+    type: str
+    default: ""
+    help: "The Steam username to use for installing the server."
   - name: Steam Branch Password
     section: Steam
     key: steam_branch_password

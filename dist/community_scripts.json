@@ -13,6 +13,7 @@
             "--skip-firewall  - Do not install or configure a system firewall",
             "--non-interactive  - Run the installer in non-interactive mode (useful for scripted installs)",
             "--branch=<str> - Use a specific branch of the management script repository DEFAULT=main",
+            "--steam-username=<str> - Use a Steam specific user for installing this game (optional)",
             "--debug  - Include to show debug output"
         ],
         "default_timeout": "600",

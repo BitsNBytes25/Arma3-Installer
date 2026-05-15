@@ -29,6 +29,7 @@
 #   --skip-firewall  - Do not install or configure a system firewall
 #   --non-interactive  - Run the installer in non-interactive mode (useful for scripted installs)
 #   --branch=<str> - Use a specific branch of the management script repository DEFAULT=main
+#   --steam-username=<str> - Use a Steam specific user for installing this game (optional)
 #   --debug  - Include to show debug output
 #
 # Changelog:
@@ -66,7 +67,7 @@ GAME_DIR="/home/${GAME_USER}/${GAME}"
 # If a newer version of the branch version is available, that will be used instead,
 # for example, "2.2.12" will use "2.2.54" if .54 is the latest, but NOT "2.3.13"
 # https://github.com/BitsNBytes25/Warlock-Manager
-MANAGER_VERSION="2.2.12"
+MANAGER_VERSION="main"
 
 function usage() {
   cat >&2 <<EOD
@@ -78,6 +79,7 @@ Options:
     --skip-firewall  - Do not install or configure a system firewall
     --non-interactive  - Run the installer in non-interactive mode (useful for scripted installs)
     --branch=<str> - Use a specific branch of the management script repository DEFAULT=main
+    --steam-username=<str> - Use a Steam specific user for installing this game (optional)
     --debug  - Include to show debug output
 
 Please ensure to run this script as root (or at least with sudo)
@@ -93,6 +95,7 @@ OVERRIDE_DIR=""
 SKIP_FIREWALL=0
 NONINTERACTIVE=0
 BRANCH="main"
+STEAM_USERNAME=""
 DEBUG=0
 while [ "$#" -gt 0 ]; do
 	case "$1" in
@@ -108,6 +111,11 @@ while [ "$#" -gt 0 ]; do
 			[ "$1" == "--branch" ] && shift 1 && BRANCH="$1" || BRANCH="${1#*=}"
 			[ "${BRANCH:0:1}" == "'" ] && [ "${BRANCH:0-1}" == "'" ] && BRANCH="${BRANCH:1:-1}"
 			[ "${BRANCH:0:1}" == '"' ] && [ "${BRANCH:0-1}" == '"' ] && BRANCH="${BRANCH:1:-1}"
+			;;
+		--steam-username=*|--steam-username)
+			[ "$1" == "--steam-username" ] && shift 1 && STEAM_USERNAME="$1" || STEAM_USERNAME="${1#*=}"
+			[ "${STEAM_USERNAME:0:1}" == "'" ] && [ "${STEAM_USERNAME:0-1}" == "'" ] && STEAM_USERNAME="${STEAM_USERNAME:1:-1}"
+			[ "${STEAM_USERNAME:0:1}" == '"' ] && [ "${STEAM_USERNAME:0-1}" == '"' ] && STEAM_USERNAME="${STEAM_USERNAME:1:-1}"
 			;;
 		--debug) DEBUG=1;;
 		-h|--help) usage;;
@@ -1047,6 +1055,12 @@ manager:
     default: public
     help: "The Steam branch to install the server from (e.g., stable, experimental)."
     group: Settings
+  - name: Steam Username
+    section: Steam
+    key: steam_username
+    type: str
+    default: ""
+    help: "The Steam username to use for installing the server."
   - name: Steam Branch Password
     section: Steam
     key: steam_branch_password
@@ -1360,7 +1374,9 @@ function install_application() {
 
 	# If you need to forward parameters to the game manager from the installer,
 	# call set-config with the appropriate key/value here.
-	# sudo -u $GAME_USER $GAME_DIR/manage.py $debug set-config "Feature Name" "$FEATURE_VALUE"
+	if [ -n "$STEAM_USERNAME" ]; then
+		$GAME_DIR/manage.py $debug set-config "Steam Username" "$STEAM_USERNAME"
+	fi
 
 	# Install installer (this script) for uninstallation or manual work
 	download "https://raw.githubusercontent.com/${REPO}/refs/heads/${BRANCH}/dist/installer.sh" "$GAME_DIR/installer.sh"
