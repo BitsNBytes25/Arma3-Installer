@@ -19,6 +19,7 @@ from warlock_manager.apps.steam_app import SteamApp
 from warlock_manager.services.base_service import BaseService
 from warlock_manager.config.ini_config import INIConfig
 from warlock_manager.config.properties_config import PropertiesConfig
+from warlock_manager.config.arma_server_config import ArmaServerConfig
 from warlock_manager.libs.app_runner import app_runner
 from warlock_manager.libs.firewall import Firewall
 from warlock_manager.libs import utils
@@ -154,9 +155,7 @@ class GameService(BaseService):
 		"""
 		super().__init__(service, game)
 		self.configs = {
-			'server': PropertiesConfig('server', os.path.join(self.get_app_directory(), 'server.properties'))
-			# A common configuration tactic is to store binary parameters in a service file in Configs.
-			# 'service': INIConfig('service', os.path.join(utils.get_base_directory(), 'Configs', 'service.%s.ini' % self.service))
+			'service': ArmaServerConfig('service', os.path.join(self.get_app_directory(), '%s.cfg' % self.service))
 		}
 		self.load()
 
@@ -167,7 +166,7 @@ class GameService(BaseService):
 		"""
 		path = os.path.join(self.get_app_directory(), 'arma3server_x64')
 
-		service_name = self.service[self.game.service_prefix.length:]
+		service_name = self.service[len(self.game.service_prefix):]
 
 		# Add arguments for the service, if applicable
 		#args = cli_formatter(self.configs['service'], 'flag')

@@ -27,6 +27,7 @@ from warlock_manager.config.ini_config import INIConfig
 # from warlock_manager.config.json_config import JSONConfig
 from warlock_manager.config.properties_config import PropertiesConfig
 # from warlock_manager.config.unreal_config import UnrealConfig
+from warlock_manager.config.arma_server_config import ArmaServerConfig
 
 # Load the application runner responsible for interfacing with CLI arguments
 # and providing default functionality for running the manager.
@@ -141,9 +142,7 @@ class GameService(BaseService):
 		"""
 		super().__init__(service, game)
 		self.configs = {
-			'server': PropertiesConfig('server', os.path.join(self.get_app_directory(), 'server.properties'))
-			# A common configuration tactic is to store binary parameters in a service file in Configs.
-			# 'service': INIConfig('service', os.path.join(utils.get_base_directory(), 'Configs', 'service.%s.ini' % self.service))
+			'service': ArmaServerConfig('service', os.path.join(self.get_app_directory(), '%s.cfg' % self.service))
 		}
 		self.load()
 
@@ -154,7 +153,7 @@ class GameService(BaseService):
 		"""
 		path = os.path.join(self.get_app_directory(), 'arma3server_x64')
 
-		service_name = self.service[self.game.service_prefix.length:]
+		service_name = self.service[len(self.game.service_prefix):]
 
 		# Add arguments for the service, if applicable
 		#args = cli_formatter(self.configs['service'], 'flag')

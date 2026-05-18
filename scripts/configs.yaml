@@ -170,3 +170,39 @@ manager:
     key: webhook
     type: str
     help: "The webhook URL for sending server status updates to a Discord channel."
+service:
+  - name: Password Admin
+    key: passwordAdmin
+    type: str
+    default: ""
+    help: "Password to become server admin. When in Arma MP and connected to the server, type '#login xyz'"
+  - name: Password
+    key: password
+    type: str
+    default: ""
+    help: "Password to join the server."
+  - name: Server Command Password
+    key: serverCommandPassword
+    type: str
+    default: ""
+    help: "Password required by alternate syntax of serverCommand server-side scripting (Case-Sensitive)."
+  - name: Hostname
+    key: hostname
+    type: str
+    default: ""
+    help: "Hostname of the server, visible in game browser."
+  - name: Max Players
+    key: maxPlayers
+    type: int
+    default: 64
+    help: "Maximum number of players allowed on the server."
+  - name: Message of the Day
+    key: motd[]
+    type: text
+    default: ""
+    help: "Message of the Day to display in the game browser."
+  - name: Message of the Day Interval
+    key: motdInterval
+    type: int
+    default: 5
+    help: "Time interval (in seconds) between each MOTD line."
