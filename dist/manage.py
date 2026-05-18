@@ -155,7 +155,8 @@ class GameService(BaseService):
 		"""
 		super().__init__(service, game)
 		self.configs = {
-			'service': ArmaServerConfig('service', os.path.join(self.get_app_directory(), '%s.cfg' % self.service))
+			'config': ArmaServerConfig('config', os.path.join(self.get_app_directory(), '%s.cfg' % self.service)),
+			'service': INIConfig('service', os.path.join(self.get_app_directory(), 'service-%s.ini'))
 		}
 		self.load()
 
@@ -165,15 +166,18 @@ class GameService(BaseService):
 		:return:
 		"""
 		path = os.path.join(self.get_app_directory(), 'arma3server_x64')
-
 		service_name = self.service[len(self.game.service_prefix):]
+		params = [
+			path,
+			'-config=%s' % service_name,
+			'-name=%s' % service_name,
+		]
 
-		# Add arguments for the service, if applicable
-		#args = cli_formatter(self.configs['service'], 'flag')
-		#if args:
-		#	path += ' ' + args
+		if not self.get_option_value('UPNP'):
+			port = self.get_option_value('Port')
+			params.append('-port=%s' % port)
 
-		return f"{path} -name={service_name} -config={service_name}.cfg"
+		return ' '.join(params)
 
 	def option_value_updated(self, option: str, previous_value, new_value) -> bool | None:
 		"""
@@ -248,14 +252,16 @@ class GameService(BaseService):
 		Get the name of this game server instance
 		:return:
 		"""
-		return self.get_option_value('Level Name')
+		return self.get_option_value('Hostname')
 
 	def get_port(self) -> int | None:
 		"""
 		Get the primary port of the service, or None if not applicable
 		:return:
 		"""
-		return self.get_option_value('Server Port')
+		if self.get_option_value('UPNP'):
+			return None
+		return self.get_option_value('Port')
 	
 	def get_port_definitions(self) -> list:
 		"""
@@ -279,9 +285,16 @@ class GameService(BaseService):
 
 		:return:
 		"""
+
+		if self.get_option_value('UPNP'):
+			# Games with UPnP enabled will use dynamic ports.
+			return []
+
 		# Return a string to a config parameter to allow changing, or a number to use a fixed port
+		port = self.get_option_value('Port')
 		return [
-			('Server Port', 'udp', '%s game port' % self.game.name, False)
+			('Port', 'udp', '%s game port' % self.game.name, False),
+			(port + 1, 'udp', '%s query port' % self.game.name, False)
 		]
 
 	def get_game_pid(self) -> int:
