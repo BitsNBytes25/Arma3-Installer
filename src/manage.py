@@ -39,6 +39,8 @@ from warlock_manager.libs.firewall import Firewall
 # Utilities provided by Warlock that are common to many applications
 from warlock_manager.libs import utils
 from warlock_manager.libs.logger import logger
+from warlock_manager.libs.cmd import Cmd
+from warlock_manager.apps.steam_app import guess_steamcmd_path
 
 # Useful in some games
 # from warlock_manager.formatters.cli_formatter import cli_formatter
@@ -66,6 +68,7 @@ class GameApp(SteamApp):
 		self.desc = 'Arma3 Dedicated Server'
 		# For steam games, include the steam ID
 		self.steam_id = '233780'
+		self.steam_client_id = '107410'
 		self.service_handler = GameService
 		# Set this to the class that handles the game mod system, if applicable
 		self.mod_handler = GameMod
@@ -390,8 +393,24 @@ class GameService(BaseService):
 		:param force: Force the installation even if the mod is already installed
 		:return:
 		"""
-		# Do whatever logic is necessary for downloading and installing a mod.
-		pass
+		# Use SteamCMD to download the mod
+		# @todo Test this installer; I do not own the game so cannot test this.
+		cmd = Cmd([
+			guess_steamcmd_path(),
+			'+force_install_dir',
+			self.get_app_directory(),
+			'+login',
+			self.game.get_option_value('Steam Username'),
+			'+workshop_download_item',
+			self.game.steam_client_id,
+			mod.id,
+			'+validate',
+			'+quit'
+		])
+		cmd.sudo(utils.get_app_uid())
+		cmd.stream_output()
+		cmd.run()
+		return cmd.success
 
 	def remove_mod(self, mod: 'GameMod') -> bool:
 		"""

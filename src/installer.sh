@@ -9,9 +9,9 @@
 # @CATEGORY Game Server
 # @TRMM-TIMEOUT 600
 # @WARLOCK-TITLE Arma 3
-# @WARLOCK-IMAGE media/some-game-image.webp
-# @WARLOCK-ICON media/some-game-icon.webp
-# @WARLOCK-THUMBNAIL media/some-game-thumbnail.webp
+# @WARLOCK-IMAGE media/arma3-image.webp
+# @WARLOCK-ICON media/arma3-icon.webp
+# @WARLOCK-THUMBNAIL media/arma3-thumbnail.webp
 #
 # Supports:
 #   Debian 12, 13
