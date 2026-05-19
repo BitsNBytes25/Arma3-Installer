@@ -1160,7 +1160,7 @@ config:
     help: "Start mission-voting when X numberOfPlayers connect."
   - name: Kick Duplicate
     key: kickduplicate
-    type: list
+    type: int
     options:
       - "0"
       - "1"
@@ -1174,7 +1174,7 @@ config:
     help: "Enable UPnP port forwarding, (disables fixed port definition)."
   - name: Allowed File Patching
     key: allowedFilePatching
-    type: list
+    type: int
     options:
       - "0"
       - "1"
