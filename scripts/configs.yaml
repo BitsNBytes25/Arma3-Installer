@@ -107,46 +107,479 @@ config:
     key: passwordAdmin
     type: str
     default: ""
+    group: Security
     help: "Password to become server admin. When in Arma MP and connected to the server, type '#login xyz'"
   - name: Password
     key: password
     type: str
     default: ""
+    group: Basic
     help: "Password to join the server."
   - name: Server Command Password
     key: serverCommandPassword
     type: str
     default: ""
+    group: Security
     help: "Password required by alternate syntax of serverCommand server-side scripting (Case-Sensitive)."
   - name: Hostname
     key: hostname
     type: str
     default: ""
+    group: Basic
     help: "Hostname of the server, visible in game browser."
   - name: Max Players
     key: maxPlayers
     type: int
     default: 64
+    group: Basic
     help: "Maximum number of players allowed on the server."
   - name: Message of the Day
     key: motd[]
     type: text
     default: ""
+    group: MOTD
     help: "Message of the Day to display in the game browser."
   - name: Message of the Day Interval
     key: motdInterval
     type: int
     default: 5
+    group: MOTD
     help: "Time interval (in seconds) between each MOTD line."
+  - name: Admins
+    key: admins[]
+    type: text
+    group: Security
+    help: "List of admin users who can use #login without password, one per line."
+  - name: Headless Clients
+    key: headlessClients[]
+    type: text
+    group: Headless Client
+    help: "List of headless clients allowed to connect, one per line."
+  - name: Local Clients
+    key: localClient[]
+    type: text
+    group: Headless Client
+    help: "List of local clients allowed to connect, one per line."
+  - name: File Patching Exceptions
+    key: filePatchingExceptions[]
+    type: text
+    group: File Patching
+    help: "List of file UIDs that will not be patched, one per line."
+  - name: Vote Threshold
+    key: voteThreshold
+    type: float
+    default: 0.5
+    group: Voting
+    help: "Percentage of players required to vote for a map to be loaded."
+  - name: Vote Mission Players
+    key: voteMissionPlayers
+    type: int
+    default: 1
+    group: Voting
+    help: "Start mission-voting when X numberOfPlayers connect."
+  - name: Kick Duplicate
+    key: kickduplicate
+    type: list
+    options:
+      - "0"
+      - "1"
+    group: Player Kick
+    help: "Do not allow duplicate game IDs. Second player with an existing ID will be kicked automatically. 1 means active, 0 disabled."
   - name: UPNP
     key: upnp
     type: bool
     default: false
-    help: "Enable UPnP port forwarding."
+    group: Settings
+    help: "Enable UPnP port forwarding, (disables fixed port definition)."
+  - name: Allowed File Patching
+    key: allowedFilePatching
+    type: list
+    options:
+      - "0"
+      - "1"
+      - "2"
+    group: File Patching
+    help: "Prevent or allow file patching for the clients (including the HC), 0=no clients, 1=headless clients only, 2=all clients"
+  - name: Allowed Load File Extensions
+    key: allowedLoadFileExtensions[]
+    type: text
+    group: File Patching
+    help: "Only allow files with listed extensions to be loaded via loadFile command. Not listing any extension means everything is allowed."
+  - name: Allowed Preprocess File Extensions
+    key: allowedPreprocessFileExtensions[]
+    type: text
+    group: File Patching
+    help: "Only allow files with listed extensions to be loaded via preprocessFile / preprocessFileLineNumbers commands. Not listing any extension means everything is allowed."
+  - name: Allowed HTML Load Extensions
+    key: allowedHTMLLoadExtensions[]
+    type: text
+    group: File Patching
+    help: "Only allow files and URLs with listed extensions to be loaded via htmlLoad command. Not listing any extension means everything is allowed."
+  - name: Allowed HTML Load URIs
+    key: allowedHTMLLoadURIs[]
+    type: text
+    group: File Patching
+    help: "Only allow files from listed URIs and URLs to be loaded via htmlLoad command. Comment out if not used. Can use += to add to the existing list. Not listing any extension means everything is allowed. Defining the setting as empty arrays means nothing is allowed."
+  - name: Max Ping
+    key: MaxPing
+    type: int
+    default: -1
+    group: Player Kick
+    help: "Maximum ping allowed for a player to connect. -1 means no limit."
+  - name: Max Ping Action
+    key: kickClientsOnSlowNetwork[]/0
+    type: int
+    default: 1
+    group: Player Kick
+    help: "Action to take when a player's ping is too high. 0=log only, 1=kick."
+  - name: Max Packet Loss
+    key: MaxPacketLoss
+    type: int
+    default: -1
+    group: Player Kick
+    help: "Maximum packet loss allowed for a player to connect. -1 means no limit."
+  - name: Max Packet Loss Action
+    key: kickClientsOnSlowNetwork[]/1
+    type: int
+    default: 1
+    group: Player Kick
+    help: "Action to take when a player's packet loss is too high. 0=log only, 1=kick."
+  - name: Max Desync
+    key: MaxDesync
+    type: int
+    default: -1
+    group: Player Kick
+    help: "Maximum desync allowed for a player to connect. -1 means no limit."
+  - name: Max Desync Action
+    key: kickClientsOnSlowNetwork[]/2
+    type: int
+    default: 1
+    group: Player Kick
+    help: "Action to take when a player's desync is too high. 0=log only, 1=kick."
+  - name: Disconnect Timeout
+    key: DisconnectTimeout
+    type: int
+    default: 15
+    group: Player Kick
+    help: "Time in seconds to wait for a player to disconnect before kicking them, range between 1 and 90 seconds."
+  - name: Disconnect Timeout Action
+    key: kickClientsOnSlowNetwork[]/3
+    type: int
+    default: 1
+    group: Player Kick
+    help: "Action to take when a player's disconnect timeout is reached. 0=log only, 1=kick."
+  - name: Enable Player Diag
+    key: enablePlayerDiag
+    type: bool
+    default: false
+    group: Player Kick
+    help: "Enable player diagnostic logging."
+  - name: Call Ext Report Limit
+    key: callExtReportLimit
+    type: int
+    default: 1000
+    group: Performance
+    help: "If server initiated callExtension takes longer than specified limit in milliseconds, the warning will be logged into server .rpt file as well as reflected in the extension return result."
+  - name: Voting Timeout
+    key: votingTimeOut
+    type: int
+    default: 60
+    group: Voting
+    help: "Voting Timeout in seconds."
+  - name: Voting Timeout (Ready)
+    key: votingTimeOut[]/0
+    type: int
+    default: 60
+    group: Voting
+    help: "Voting timeout in seconds for ready state."
+  - name: Voting Timeout (Not Ready)
+    key: votingTimeOut[]/1
+    type: int
+    default: 90
+    group: Voting
+    help: "Voting timeout in seconds for not ready state."
+  - name: Role Timeout
+    key: roleTimeOut
+    type: int
+    default: 60
+    group: Voting
+    help: "Role selection timeout in seconds."
+  - name: Role Timeout (Ready)
+    key: roleTimeOut[]/0
+    type: int
+    default: 60
+    group: Voting
+    help: "Role selection timeout in seconds for ready state."
+  - name: Role Timeout (Not Ready)
+    key: roleTimeOut[]/1
+    type: int
+    default: 120
+    group: Voting
+    help: "Role selection timeout in seconds for not ready state."
+  - name: Briefing Timeout
+    key: briefingTimeOut
+    type: int
+    default: 60
+    group: Voting
+    help: "Briefing timeout in seconds."
+  - name: Briefing Timeout (Ready)
+    key: briefingTimeOut[]/0
+    type: int
+    default: 60
+    group: Voting
+    help: "Briefing timeout in seconds for ready state."
+  - name: Briefing Timeout (Not Ready)
+    key: briefingTimeOut[]/1
+    type: int
+    default: 90
+    group: Voting
+    help: "Briefing timeout in seconds for not ready state."
+  - name: Debriefing Timeout
+    key: debriefingTimeOut
+    type: int
+    default: 45
+    group: Voting
+    help: "Debriefing timeout in seconds."
+  - name: Debriefing Timeout (Ready)
+    key: debriefingTimeOut[]/0
+    type: int
+    default: 45
+    group: Voting
+    help: "Debriefing timeout in seconds for ready state."
+  - name: Debriefing Timeout (Not Ready)
+    key: debriefingTimeOut[]/1
+    type: int
+    default: 60
+    group: Voting
+    help: "Debriefing timeout in seconds for not ready state."
+  - name: Lobby Idle Timeout
+    key: lobbyIdleTimeout
+    type: int
+    default: 0
+    group: Voting
+    help: "Lobby idle timeout in seconds."
+  - name: Missions To Server Restart
+    key: missionsToServerRestart
+    type: int
+    default: 0
+    group: Missions
+    help: "Number of missions to restart the server after."
+  - name: Missions To Shutdown
+    key: missionsToShutdown
+    type: int
+    default: 0
+    group: Missions
+    help: "Number of missions to shutdown the server after."
+  - name: Auto Select Mission
+    key: autoSelectMission
+    type: bool
+    default: false
+    group: Missions
+    help: "Automatically select the mission when the server starts."
+  - name: Random Mission Order
+    key: randomMissionOrder
+    type: bool
+    default: false
+    group: Missions
+    help: "Randomize the order of missions."
+  - name: Idle FPS Limit
+    key: idleFPSLimit
+    type: int
+    default: 30
+    group: Performance
+    help: "Maximum server FPS limit when no players connected."
+  - name: Verify Signatures
+    key: verifySignatures
+    type: int
+    default: 2
+    group: Security
+    help: "Enables or disables the signature verification for addons.  0=disabled, 2=enabled"
+  - name: Drawing In Map
+    key: drawingInMap
+    type: bool
+    default: true
+    group: Map
+    help: "Enables or disables the ability to place markers and draw lines in map."
+  - name: Disable VoN
+    key: disableVoN
+    type: int
+    default: 0
+    group: Voice
+    help: "Disable Voice Over Network. 0=enabled, 1=disabled"
+  - name: VoN Codec Quality
+    key: vonCodecQuality
+    type: int
+    default: 3
+    group: Voice
+    help: "Voice Over Network codec quality. 0-10 for 8kHz, 11-20 for 16kHz, 21-30 for 32kHz"
+  - name: VoN Codec
+    key: vonCodec
+    type: int
+    default: 1
+    group: Voice
+    help: "Voice Over Network codec. 0=Speex, 1=Opus"
+  - name: Skip Lobby
+    key: skipLobby
+    type: bool
+    default: false
+    group: Missions
+    help: "If true, joining player will skip role selection. This is only used if no Mission, Campaign or Config setting skipLobby is defined"
+  - name: Allow Profile Glasses
+    key: allowProfileGlasses
+    type: bool
+    default: true
+    group: Profile
+    help: "If false, glasses set in player profile will be ignored. This is only used if no Mission, Campaign or Config setting allowProfileGlasses is defined"
+  - name: Zeus Composition Script Level
+    key: zeusCompositionScriptLevel
+    type: int
+    default: 1
+    group: Zeus
+    help: "Zeus Composition Script Level. 0=all scripts are forbidden, 1=only attributes are allowed, 2=all scripts are allowed including init scripts"
+  - name: Log File
+    key: logFile
+    type: str
+    default: ""
+    group: Logging
+    help: "Enables output of dedicated server console into textfile. Default location of log is same as crash dumps and other logs."
+  - name: Double Id Detected
+    key: doubleIdDetected
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: On User Connected
+    key: onUserConnected
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: On User Disconnected
+    key: onUserDisconnected
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: On Hacked Data
+    key: onHackedData
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: On Different Data
+    key: onDifferentData
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: on Unsigned Data
+    key: onUnsignedData
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: On User Kicked
+    key: onUserKicked
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: Regular Check
+    key: regularCheck
+    type: str
+    default: ""
+    group: Commands
+    help: "See server side scripting"
+  - name: BattlEye
+    key: BattlEye
+    type: bool
+    default: true
+    group: Security
+    help: "Enables or disables BattlEye."
+  - name: Timestamp Format
+    key: timeStampFormat
+    type: str
+    default: "short"
+    group: Logging
+    options:
+      - none
+      - short
+      - full
+    help: "Timestamp format."
+  - name: Timestamp Format Console
+    key: timeStampFormatConsole
+    type: str
+    default: "short"
+    group: Logging
+    options:
+      - none
+      - short
+      - full
+    help: "Timestamp format for console."
+  - name: Force Rotor Lib Simulation
+    key: forceRotorLibSimulation
+    type: int
+    default: 0
+    group: Settings
+    help: "Enforces the Advanced Flight Model on the server. 0 (up to the player). 1 - forced AFM, 2 - forced SFM."
+  - name: Persistent
+    key: persistent
+    type: bool
+    default: false
+    group: Missions
+    help: "Mission keeps running when all clients disconnect. Enabling the persistence option will make missions that have either base or instant respawn keep on running after all players have disconnected."
+  - name: Required Build
+    key: requiredBuild
+    type: int
+    default: 0
+    group: Settings
+    help: "Minimum required client version. Clients with version lower than requiredBuild will not be able to connect."
+  - name: Statistics Enabled
+    key: statisticsEnabled
+    type: bool
+    default: true
+    group: Settings
+    help: "Enables or disables statistics."
+  - name: Forced Difficulty
+    key: forcedDifficulty
+    type: str
+    default: ""
+    group: Settings
+    help: "If Recruit, Regular or Veteran is passed as the parameter, the particular difficulty options will be taken from data config, from the class CfgDifficultyPresets."
+  - name: Mission Whitelist
+    key: missionWhitelist[]
+    type: text
+    group: Missions
+    help: "List of missions that can be loaded by players. One mission per line."
+  - name: Steam Protocol Max Data Size
+    key: steamProtocolMaxDataSize
+    type: int
+    default: 1024
+    group: Settings
+    help: "Maximum size of Steam protocol data in bytes."
+  - name: Arma Units Timeout
+    key: armaUnitsTimeout
+    type: int
+    default: 30
+    group: Settings
+    help: "Defines how long the player will be stuck connecting and wait for armaUnits data. Player will be notified if timeout elapsed and no units data was received"
+  - name: Override Haze Quality
+    key: overrideHazeQuality
+    type: int
+    default: -1
+    group: Settings
+    help: "Override Haze Quality. -1 = use default, 0 = very low, 1 = low, 2 = standard"
+  - name: Mission HTTP Download Base URL
+    key: missionHTTPDownloadBaseURL
+    type: str
+    default: ""
+    group: Missions
+    help: "When defined the client will try to download the mission file using a HTTP GET request to the provided URL with the mission name appended at the end"
 service:
   - name: Port
     key: port
     section: CLI
     type: int
     default: 2302
+    group: Settings
     help: "The port to run the server on."

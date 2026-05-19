@@ -175,25 +175,72 @@ class GameService(BaseService):
 		:return:
 		"""
 		success = None
+		rebuild = False
 
 		# Special option actions
-		if option == 'Server Port':
-			# Update firewall for game port change
-			if previous_value:
-				Firewall.remove(int(previous_value), 'tcp')
-			Firewall.allow(int(new_value), 'tcp', '%s game port' % self.game.name)
-			success = True
-		elif option == 'Query Port':
+		if option == 'Port':
 			# Update firewall for game port change
 			if previous_value:
 				Firewall.remove(int(previous_value), 'udp')
-			Firewall.allow(int(new_value), 'udp', '%s query port' % self.game.name)
+				Firewall.remove(int(previous_value) + 1, 'udp')
+				Firewall.remove(int(previous_value) + 2, 'udp')
+				Firewall.remove(int(previous_value) + 3, 'udp')
+				Firewall.remove(int(previous_value) + 4, 'udp')
+			Firewall.allow(int(new_value), 'udp', '%s game' % self.game.name)
+			Firewall.allow(int(new_value) + 1, 'udp', '%s query' % self.game.name)
+			Firewall.allow(int(new_value) + 2, 'udp', '%s master' % self.game.name)
+			Firewall.allow(int(new_value) + 3, 'udp', '%s von' % self.game.name)
+			Firewall.allow(int(new_value) + 4, 'udp', '%s battleye' % self.game.name)
+			rebuild = True
+			success = True
+		elif option == 'UPNP':
+			rebuild = True
 			success = True
 
-		# For games that need to regenerate systemd to apply changes
-		#self.build_systemd_config()
-		#self.reload()
+		if rebuild:
+			# For games that need to regenerate systemd to apply changes
+			self.build_systemd_config()
+			self.reload()
 		return success
+
+	def get_option_value(self, option: str) -> str | int | bool:
+		"""
+		Get a configuration option from the service config
+
+		:param option:
+		:return:
+		"""
+		val = super().get_option_value(option)
+		if option == 'Message of the Day' and isinstance(val, list):
+			return '\n'.join(val)
+		else:
+			return val
+
+	def set_option(self, option: str, value: str | int | bool) -> bool:
+		"""
+		Set a configuration option in the service config
+
+		:param option:
+		:param value:
+		:return:
+		"""
+		trimmed_joins = (
+			'Admins',
+			'Headless Clients',
+			'Local Clients',
+			'File Patching Exceptions',
+			'Allowed Load File Extensions',
+			'Allowed Preprocess File Extensions',
+			'Allowed HTML Load Extensions',
+			'Allowed HTML Load URIs',
+			'Mission Whitelist'
+		)
+		if option == 'Message of the Day':
+			value = value.split('\n')
+		elif option in trimmed_joins:
+			value = value.strip().split('\n')
+
+		return super().set_option(option, value)
 
 	def is_api_enabled(self) -> bool:
 		"""
@@ -280,8 +327,11 @@ class GameService(BaseService):
 		# Return a string to a config parameter to allow changing, or a number to use a fixed port
 		port = self.get_option_value('Port')
 		return [
-			('Port', 'udp', '%s game port' % self.game.name, False),
-			(port + 1, 'udp', '%s query port' % self.game.name, False)
+			('Port', 'udp', '%s game' % self.game.name, False),
+			(port + 1, 'udp', '%s query' % self.game.name, False),
+			(port + 2, 'udp', '%s master' % self.game.name, False),
+			(port + 3, 'udp', '%s von' % self.game.name, False),
+			(port + 4, 'udp', '%s battleye' % self.game.name, False)
 		]
 
 	def get_game_pid(self) -> int:
