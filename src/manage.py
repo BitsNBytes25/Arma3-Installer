@@ -333,7 +333,7 @@ class GameService(BaseService):
 			('Port', 'udp', '%s game' % self.game.name, False),
 			(port + 1, 'udp', '%s query' % self.game.name, False),
 			(port + 2, 'udp', '%s master' % self.game.name, False),
-			(port + 3, 'udp', '%s von' % self.game.name, False),
+			(port + 3, 'udp', '%s von' % self.game.name, True),  # VON port is currently unused, but reserved
 			(port + 4, 'udp', '%s battleye' % self.game.name, False)
 		]
 
